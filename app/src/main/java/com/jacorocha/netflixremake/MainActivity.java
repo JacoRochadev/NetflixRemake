@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jacorocha.netflixremake.model.Category;
 import com.jacorocha.netflixremake.model.Movie;
 
 import java.util.ArrayList;
@@ -25,31 +27,82 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view_main);
 
-        List<Movie> movies = new ArrayList<>();
-        for (int i = 0; i < 30; i++ ){
-            Movie movie = new Movie();
-            movie.setCoverUrl("abc" + i);
-            movies.add(movie);
+        List<Category> categories = new ArrayList<>();
+        for (int j = 0; j < 10; j++) {
+            Category category = new Category();
+            category.setName("cat" + j);
+
+            List<Movie> movies = new ArrayList<>();
+            for (int i = 0; i < 30; i++) {
+                Movie movie = new Movie();
+//                movie.setCoverUrl(R.drawable.movie);
+                movies.add(movie);
+            }
+            category.setMovies(movies);
+            categories.add(category);
         }
 
-        mainadapter = new MainAdapter(movies);
+        mainadapter = new MainAdapter(categories);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setAdapter(mainadapter);
     }
     private static class MovieHolder extends RecyclerView.ViewHolder {
-        final TextView textViewUrl;
+        final ImageView imageViewCover;
 
         public MovieHolder(@NonNull View itemView) {
             super(itemView);
-           textViewUrl =  itemView.findViewById(R.id.text_view_url);
+            imageViewCover =  itemView.findViewById(R.id.image_view_cover);
         }
     }
 
-    private class MainAdapter extends RecyclerView.Adapter<MovieHolder>{
+    private static class CategoryHolder extends RecyclerView.ViewHolder {
+        TextView textViewTitle;
+        RecyclerView recyclerViewMovie;
+
+
+        public CategoryHolder(@NonNull View itemView) {
+            super(itemView);
+            textViewTitle = itemView.findViewById(R.id.text_view_title);
+            recyclerViewMovie = itemView.findViewById(R.id.recycler_view_movie);
+        }
+    }
+
+    //adapter das categorias
+    private class MainAdapter extends RecyclerView.Adapter<CategoryHolder>{
+
+        private final List<Category> categories;
+
+        public MainAdapter(List<Category> categories) {
+            this.categories = categories;
+        }
+
+        @NonNull
+        @Override
+        public CategoryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new CategoryHolder(getLayoutInflater().inflate(R.layout.category_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull CategoryHolder holder, int position) {
+            Category category = categories.get(position);
+            holder.textViewTitle.setText(category.getName());
+            holder.recyclerViewMovie.setAdapter(new MovieAdapter(category.getMovies()));
+            holder.recyclerViewMovie.setLayoutManager(new LinearLayoutManager(getBaseContext(), RecyclerView.HORIZONTAL, false));
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return categories.size();
+        }
+    }
+
+    //adapter dos filmes
+    private class MovieAdapter extends RecyclerView.Adapter<MovieHolder>{
 
         private final List<Movie> movies;
 
-        public MainAdapter(List<Movie> movies) {
+        public MovieAdapter(List<Movie> movies) {
             this.movies = movies;
         }
 
@@ -62,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull MovieHolder holder, int position) {
             Movie movie = movies.get(position);
-            holder.textViewUrl.setText(movie.getCoverUrl());
+//            holder.imageViewCover.setImageResource(movie.getCoverUrl());
 
         }
 
