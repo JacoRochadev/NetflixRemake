@@ -49,10 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private static class MovieHolder extends RecyclerView.ViewHolder {
         final ImageView imageViewCover;
 
-        public MovieHolder(@NonNull View itemView) {
-            super(itemView);
-            imageViewCover =  itemView.findViewById(R.id.image_view_cover);
-        }
+    public MovieHolder(@NonNull View itemView) {
+        super(itemView);
+        imageViewCover =  itemView.findViewById(R.id.image_view_cover);
+    }
     }
 
     private static class CategoryHolder extends RecyclerView.ViewHolder {
