@@ -13,11 +13,12 @@ import android.widget.TextView;
 
 import com.jacorocha.netflixremake.model.Category;
 import com.jacorocha.netflixremake.model.Movie;
+import com.jacorocha.netflixremake.util.CategoryTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CategoryTask.CategoryLoader {
 
     private MainAdapter mainadapter;
     @Override
@@ -28,23 +29,14 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view_main);
 
         List<Category> categories = new ArrayList<>();
-        for (int j = 0; j < 10; j++) {
-            Category category = new Category();
-            category.setName("cat" + j);
-
-            List<Movie> movies = new ArrayList<>();
-            for (int i = 0; i < 30; i++) {
-                Movie movie = new Movie();
-//                movie.setCoverUrl(R.drawable.movie);
-                movies.add(movie);
-            }
-            category.setMovies(movies);
-            categories.add(category);
-        }
 
         mainadapter = new MainAdapter(categories);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setAdapter(mainadapter);
+
+        CategoryTask categoryTask = new CategoryTask(this);
+        categoryTask.setCategoryLoader(this);
+        categoryTask.execute("https://tiagoaguiar.co/api/netflix/home");
     }
     private static class MovieHolder extends RecyclerView.ViewHolder {
         final ImageView imageViewCover;
@@ -70,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     //adapter das categorias
     private class MainAdapter extends RecyclerView.Adapter<CategoryHolder>{
 
-        private final List<Category> categories;
+        private List<Category> categories;
 
         public MainAdapter(List<Category> categories) {
             this.categories = categories;
@@ -95,6 +87,17 @@ public class MainActivity extends AppCompatActivity {
         public int getItemCount() {
             return categories.size();
         }
+
+        void setCategories(List<Category> categories) {
+            this.categories.clear();
+            this.categories.addAll(categories);
+        }
+    }
+
+    @Override
+    public void onResult(List<Category> categories) {
+        mainadapter.setCategories(categories);
+        mainadapter.notifyDataSetChanged();
     }
 
     //adapter dos filmes
